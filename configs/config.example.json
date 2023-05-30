@@ -1,0 +1,34 @@
+{
+  "app": {
+    "environment": "development",
+    "name": "lion",
+    "description": "lion air service",
+    "port": 8080,
+    "version": "1.0.0",
+    "httpRequestTimeout": 30,
+    "grpcRequestTimeout": 60
+  },
+  "integration": {
+    "credentials": {
+      "username": "",
+      "password": "",
+      "organization": "JT"
+    },
+    "url": "http://202.4.170.9",
+    "target": "Test",
+    "service": {
+      "sessionCreate": {
+        "version": "1.0",
+        "path": "/LionAirTAAPI/SessionCreate.asmx"
+      },
+      "sessionClose": {
+        "version": "1.0",
+        "path": "/LionAirTAAPI/SessionClose.asmx"
+      },
+      "flightMatrix": {
+        "version": "1.1",
+        "path": "/LionAirTAAPI/FlightMatrixService.asmx"
+      }
+    }
+  }
+}
