@@ -17,6 +17,7 @@ type Request interface {
 	SessionCreate(ctx context.Context, request string) (string, error)
 	SessionClose(ctx context.Context, request string) (string, error)
 	FlightMatrix(ctx context.Context, request string) (string, error)
+	OTAAirSell(ctx context.Context, request string) (string, error)
 }
 
 type request struct {
@@ -98,6 +99,24 @@ func (r *request) FlightMatrix(ctx context.Context, request string) (string, err
 		return "", err
 	}
 
+	return body, nil
+}
+
+func (r *request) OTAAirSell(ctx context.Context, request string) (string, error) {
+	if r.config.Integration.Url == "" {
+		return "", errors.New("the provided URL is empty")
+	}
+
+	url := fmt.Sprintf("%s%s", r.config.Integration.Url, r.config.Integration.Service.OTAAirSell.Path)
+	fmt.Println(request)
+	call, err := r.soapClient.MakeSOAPCall(ctx, url, request)
+	if err != nil {
+		return "", fmt.Errorf("failed to make SOAP call: %w", err)
+	}
+	body, err := r.getBody(call)
+	if err != nil {
+		return "", err
+	}
 	return body, nil
 }
 

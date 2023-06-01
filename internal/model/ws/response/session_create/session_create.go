@@ -2,7 +2,6 @@ package session_create
 
 import (
 	"encoding/xml"
-	"fmt"
 )
 
 type SessionCreateXMLResponse struct {
@@ -39,19 +38,4 @@ type SessionCreateXMLResponse struct {
 			LogonResult string `xml:"LogonResult"` // OK
 		} `xml:"LogonResponse"`
 	} `xml:"Body"`
-}
-
-func (s *SessionCreateXMLResponse) CheckAPIError() error {
-	if errorText := s.Body.LogonResponse.LogonResult; errorText != "OK" {
-		return fmt.Errorf("API response error: %s", errorText)
-	}
-	return nil
-}
-
-func (s *SessionCreateXMLResponse) GetBinarySecurityToken() (string, error) {
-	err := s.CheckAPIError()
-	if err != nil {
-		return "", err
-	}
-	return s.Header.Security.BinarySecurityToken, nil
 }

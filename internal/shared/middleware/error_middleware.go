@@ -42,7 +42,7 @@ func EchoErrorHandler(err error, c echo.Context) {
 	default:
 		c.JSON(http.StatusInternalServerError, response.Response{
 			Code:    http.StatusInternalServerError,
-			Message: http.StatusText(http.StatusInternalServerError),
+			Message: err.Error(),
 		})
 	}
 }

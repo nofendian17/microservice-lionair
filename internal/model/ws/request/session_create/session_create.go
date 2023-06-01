@@ -2,7 +2,6 @@ package session_create
 
 import (
 	"encoding/xml"
-	"time"
 )
 
 type SessionCreateXMLRequest struct {
@@ -46,29 +45,4 @@ type SessionCreateXMLRequest struct {
 			Xmlns string `xml:"xmlns,attr"`
 		} `xml:"Logon"`
 	} `xml:"soap:Body"`
-}
-
-func (r *SessionCreateXMLRequest) NewSessionCreate(conversationID, username, password, organization string) (string, error) {
-	timestamp := time.Now().Format("2006-01-02T15:04:05Z")
-
-	r.Nm1 = "http://www.vedaleon.com/webservices"
-	r.Soap = "http://schemas.xmlsoap.org/soap/envelope/"
-	r.Header.MessageHeader.Xmlns = "http://www.ebxml.org/namespaces/messageHeader"
-	r.Header.MessageHeader.CPAId = "JT"
-	r.Header.MessageHeader.ConversationId = conversationID
-	r.Header.MessageHeader.Service = "Create"
-	r.Header.MessageHeader.Action = "CreateSession"
-	r.Header.MessageHeader.MessageData.Timestamp = timestamp
-	r.Header.Security.Xmlns = "http://schemas.xmlsoap.org/ws/2002/12/secext"
-	r.Header.Security.UsernameToken.Username = username
-	r.Header.Security.UsernameToken.Password = password
-	r.Header.Security.UsernameToken.Organization.Text = organization
-	r.Body.Logon.Xmlns = "http://www.vedaleon.com/webservices"
-
-	xmlData, err := xml.MarshalIndent(r, "", "    ")
-	if err != nil {
-		return "", err
-	}
-
-	return string(xmlData), nil
 }

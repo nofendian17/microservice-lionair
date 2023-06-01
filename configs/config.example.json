@@ -3,7 +3,7 @@
     "environment": "development",
     "name": "lion",
     "description": "lion air service",
-    "port": 8080,
+    "port": 8000,
     "version": "1.0.0",
     "httpRequestTimeout": 30,
     "grpcRequestTimeout": 60
@@ -28,7 +28,17 @@
       "flightMatrix": {
         "version": "1.1",
         "path": "/LionAirTAAPI/FlightMatrixService.asmx"
+      },
+      "otaAirSell": {
+        "version": "2.1",
+        "path": "/LionAirTAAPI/OTA_AirSellService.asmx"
       }
+    }
+  },
+  "storage": {
+    "redis": {
+      "address": "localhost:6379",
+      "db": 0
     }
   }
 }

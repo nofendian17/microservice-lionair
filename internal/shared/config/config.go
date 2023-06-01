@@ -9,6 +9,7 @@ import (
 type Config struct {
 	App         app         `json:"app" validate:"required"`
 	Integration integration `json:"integration" validate:"required"`
+	Storage     storage     `json:"storage"`
 	Logger      logger      `json:"logger" validate:"required"`
 }
 
@@ -41,13 +42,26 @@ type service struct {
 	FlightMatrix struct {
 		Version string `json:"version" validate:"required"`
 		Path    string `json:"path" validate:"required"`
-	} `json:"FlightMatrix"`
+	} `json:"flightMatrix"`
+	OTAAirSell struct {
+		Version string `json:"version" validate:"required"`
+		Path    string `json:"path" validate:"required"`
+	} `json:"otaAirSell"`
 }
 
 type credentials struct {
 	Username     string `json:"username" validate:"required"`
 	Password     string `json:"password" validate:"required"`
 	Organization string `json:"organization" validate:"required"`
+}
+
+type storage struct {
+	Redis redis `json:"redis"`
+}
+
+type redis struct {
+	Address string `json:"address"`
+	DB      int    `json:"db"`
 }
 
 type logger struct {
