@@ -18,6 +18,8 @@ func SetupRoutes(container *container.Container, e *echo.Echo, handler *Handler)
 
 	// V1 routes
 	v1 := e.Group(VERSION1)
+	v1.POST("/sessionCreate", handler.lion.SessionCreate)
+	v1.POST("/sessionClose", handler.lion.SessionClose)
 	v1.POST("/schedule", handler.lion.Schedule)
 	v1.POST("/pricing", handler.lion.Pricing)
 }

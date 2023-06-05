@@ -3,17 +3,12 @@
     "environment": "development",
     "name": "lion",
     "description": "lion air service",
-    "port": 8000,
+    "port": 3000,
     "version": "1.0.0",
     "httpRequestTimeout": 30,
     "grpcRequestTimeout": 60
   },
   "integration": {
-    "credentials": {
-      "username": "",
-      "password": "",
-      "organization": "JT"
-    },
     "url": "http://202.4.170.9",
     "target": "Test",
     "service": {
@@ -33,7 +28,8 @@
         "version": "2.1",
         "path": "/LionAirTAAPI/OTA_AirSellService.asmx"
       }
-    }
+    },
+    "sessionTTL": 60
   },
   "storage": {
     "redis": {

@@ -6,14 +6,19 @@ import (
 
 type (
 	FlightMatrixXMLResponse struct {
-		XMLName         xml.Name          `xml:"Envelope"`
-		Text            string            `xml:",chardata"`
-		Soap            string            `xml:"soap,attr"`
-		Xsi             string            `xml:"xsi,attr"`
-		Xsd             string            `xml:"xsd,attr"`
-		Header          Header            `xml:"Header"`
-		Body            Body              `xml:"Body"`
-		AdditionalField map[string]string `xml:"-"`
+		XMLName xml.Name `xml:"Envelope"`
+		Text    string   `xml:",chardata"`
+		Soap    string   `xml:"soap,attr"`
+		Xsi     string   `xml:"xsi,attr"`
+		Xsd     string   `xml:"xsd,attr"`
+		Header  Header   `xml:"Header"`
+		Body    Body     `xml:"Body"`
+		Fault
+	}
+
+	Fault struct {
+		FaultCode   TextElement `xml:"faultcode"`
+		FaultString TextElement `xml:"faultstring"`
 	}
 
 	Header struct {
@@ -44,18 +49,12 @@ type (
 	}
 
 	Body struct {
-		Text                         string                        `xml:",chardata"`
-		FlightMatrixRequestResponse  *FlightMatrixRequestResponse  `xml:"FlightMatrixRequestResponse,omitempty"`
-		FlightMatrixRequest2Response *FlightMatrixRequest2Response `xml:"FlightMatrixRequest2Response,omitempty"`
+		Text                         string                       `xml:",chardata"`
+		FlightMatrixRequestResponse  *FlightMatrixRequestResponse `xml:"FlightMatrixRequestResponse,omitempty"`
+		FlightMatrixRequest2Response *FlightMatrixRequestResponse `xml:"FlightMatrixRequest2Response,omitempty"`
 	}
 
 	FlightMatrixRequestResponse struct {
-		Text           string         `xml:",chardata"`
-		Xmlns          string         `xml:"xmlns,attr"`
-		FlightMatrixRS FlightMatrixRS `xml:"FlightMatrixRS"`
-	}
-
-	FlightMatrixRequest2Response struct {
 		Text           string         `xml:",chardata"`
 		Xmlns          string         `xml:"xmlns,attr"`
 		FlightMatrixRS FlightMatrixRS `xml:"FlightMatrixRS"`

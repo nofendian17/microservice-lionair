@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/xml"
 	"errors"
+	"github.com/spf13/cast"
 	"lion/internal/model/lion"
 	wsFlightMatrixRequest "lion/internal/model/ws/request/flight_matrix"
 	wsFlightMatrixResponse "lion/internal/model/ws/response/flight_matrix"
@@ -149,10 +150,7 @@ func (f *flightMatrix) GetFlightScheduleWithSession(
 
 	// todo : need parsing schedule
 
-	return &lion.ScheduleResponse{
-		OneWay: nil,
-		Return: nil,
-	}, nil
+	return &lion.ScheduleResponse{}, nil
 }
 
 func (f *flightMatrix) GetFlightScheduleWithOutSession(
@@ -245,17 +243,90 @@ func (f *flightMatrix) GetFlightScheduleWithOutSession(
 	if err != nil {
 		return nil, err
 	}
+
+	originDestinationOptions, err := f.originDestinationOptions(flightMatrixResponse)
+	if err != nil {
+		return nil, err
+	}
+	return originDestinationOptions, nil
+}
+
+func (f *flightMatrix) originDestinationOptions(response string) (*lion.ScheduleResponse, error) {
 	flightMatrixXMLResponse := &wsFlightMatrixResponse.FlightMatrixXMLResponse{}
-	err = xml.Unmarshal([]byte(flightMatrixResponse), flightMatrixXMLResponse)
+	err := xml.Unmarshal([]byte(response), flightMatrixXMLResponse)
 	if err != nil {
 		return nil, err
 	}
 
-	// todo : need parsing schedule
-	return &lion.ScheduleResponse{
-		OneWay: nil,
-		Return: nil,
-	}, nil
+	flightMatrixResponse := flightMatrixXMLResponse.Body.FlightMatrixRequest2Response
+	if flightMatrixResponse == nil {
+		flightMatrixResponse = flightMatrixXMLResponse.Body.FlightMatrixRequestResponse
+	}
+
+	flightMatrices := flightMatrixResponse.FlightMatrixRS.FlightMatrices.FlightMatrix
+	schedule := make(map[int][]lion.OriginDestinationOption, len(flightMatrices))
+
+	for i, fm := range flightMatrices {
+		originDestOpts := make([]lion.OriginDestinationOption, len(fm.FlightMatrixRows.FlightMatrixRow))
+
+		for j, row := range fm.FlightMatrixRows.FlightMatrixRow {
+			originDestOpts[j] = lion.OriginDestinationOption{
+				RPH:           cast.ToUint(row.RPH.Text),
+				FlightSegment: f.extractFlightSegment(row),
+			}
+		}
+
+		schedule[i] = originDestOpts
+	}
+
+	scheduleResponse := &lion.ScheduleResponse{
+		OW: schedule[0],
+		RT: schedule[1],
+	}
+
+	if scheduleResponse.OW == nil {
+		scheduleResponse.OW = make([]lion.OriginDestinationOption, 0)
+	}
+
+	if scheduleResponse.RT == nil {
+		scheduleResponse.RT = make([]lion.OriginDestinationOption, 0)
+	}
+
+	return scheduleResponse, nil
+}
+
+func (f *flightMatrix) extractFlightSegment(rows wsFlightMatrixResponse.FlightMatrixRow) []lion.FlightSegment {
+	var flightSegments []lion.FlightSegment
+	for _, segment := range rows.OriginDestinationOptionType.FlightSegment {
+		flightSegment := lion.FlightSegment{
+			ArrivalDateTime:     segment.ArrivalDateTime,
+			DepartureDateTime:   segment.DepartureDateTime,
+			FlightNumber:        segment.FlightNumber,
+			StopQuantity:        cast.ToUint(segment.StopQuantity),
+			OriginLocation:      segment.DepartureAirport.LocationCode,
+			DestinationLocation: segment.ArrivalAirport.LocationCode,
+			Equipment:           segment.Equipment.AirEquipType,
+			MarketingAirline:    segment.MarketingAirline.Code,
+			OperatingAirline:    segment.OperatingAirline.Code,
+			Duration:            segment.Duration.Text,
+			Meal:                "",
+			BookingClassAvails:  f.extractBookingClassAvails(segment),
+		}
+		flightSegments = append(flightSegments, flightSegment)
+	}
+	return flightSegments
+}
+
+func (f *flightMatrix) extractBookingClassAvails(segment wsFlightMatrixResponse.FlightSegment) []lion.BookingClassAvail {
+	var classes []lion.BookingClassAvail
+	for _, v := range segment.BookingClassAvails.BookingClassAvail {
+		class := lion.BookingClassAvail{
+			Class:    v.ResBookDesigCode,
+			Quantity: cast.ToUint(v.ResBookDesigQuantity),
+		}
+		classes = append(classes, class)
+	}
+	return classes
 }
 
 func NewFlightMatrix(lionRequest Request) FlightMatrix {

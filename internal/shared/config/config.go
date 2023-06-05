@@ -24,10 +24,10 @@ type app struct {
 }
 
 type integration struct {
-	Credentials credentials `json:"credentials" validate:"required"`
-	Url         string      `json:"url" validate:"required"`
-	Target      string      `json:"target" validate:"required"`
-	Service     service     `json:"service" validate:"required"`
+	Url        string  `json:"url" validate:"required"`
+	Target     string  `json:"target" validate:"required"`
+	Service    service `json:"service" validate:"required"`
+	SessionTTL int     `json:"sessionTTL" validate:"required"`
 }
 
 type service struct {
@@ -47,12 +47,6 @@ type service struct {
 		Version string `json:"version" validate:"required"`
 		Path    string `json:"path" validate:"required"`
 	} `json:"otaAirSell"`
-}
-
-type credentials struct {
-	Username     string `json:"username" validate:"required"`
-	Password     string `json:"password" validate:"required"`
-	Organization string `json:"organization" validate:"required"`
 }
 
 type storage struct {

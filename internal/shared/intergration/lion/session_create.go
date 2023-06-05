@@ -10,29 +10,30 @@ import (
 )
 
 type SessionCreate interface {
-	GetBinarySecurityToken(ctx context.Context, conversationID, username, password, organization string) (string, error)
+	GetBinarySecurityToken(ctx context.Context, conversationID, sessionID, username, password string) (string, error)
 }
 
 type sessionCreate struct {
 	lionRequest Request
 }
 
-func (s *sessionCreate) GetBinarySecurityToken(ctx context.Context, conversationID, username, password, organization string) (string, error) {
+func (s *sessionCreate) GetBinarySecurityToken(ctx context.Context, conversationID, sessionID, username, password string) (string, error) {
 	sessionCreateRequest := &wsSessionCreateRequest.SessionCreateXMLRequest{}
 	timestamp := time.Now().Format("2006-01-02T15:04:05Z")
 
 	sessionCreateRequest.Nm1 = "http://www.vedaleon.com/webservices"
 	sessionCreateRequest.Soap = "http://schemas.xmlsoap.org/soap/envelope/"
 	sessionCreateRequest.Header.MessageHeader.Xmlns = "http://www.ebxml.org/namespaces/messageHeader"
-	sessionCreateRequest.Header.MessageHeader.CPAId = "JT"
+	sessionCreateRequest.Header.MessageHeader.CPAId = "DEFAULT"
 	sessionCreateRequest.Header.MessageHeader.ConversationId = conversationID
 	sessionCreateRequest.Header.MessageHeader.Service = "Create"
 	sessionCreateRequest.Header.MessageHeader.Action = "CreateSession"
+	sessionCreateRequest.Header.MessageHeader.MessageData.MessageId = sessionID
 	sessionCreateRequest.Header.MessageHeader.MessageData.Timestamp = timestamp
 	sessionCreateRequest.Header.Security.Xmlns = "http://schemas.xmlsoap.org/ws/2002/12/secext"
 	sessionCreateRequest.Header.Security.UsernameToken.Username = username
 	sessionCreateRequest.Header.Security.UsernameToken.Password = password
-	sessionCreateRequest.Header.Security.UsernameToken.Organization.Text = organization
+	sessionCreateRequest.Header.Security.UsernameToken.Organization.Text = "JT"
 	sessionCreateRequest.Body.Logon.Xmlns = "http://www.vedaleon.com/webservices"
 
 	xmlData, err := xml.MarshalIndent(sessionCreateRequest, "", "    ")

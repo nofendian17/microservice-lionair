@@ -5,46 +5,44 @@ import (
 )
 
 type ScheduleRequest struct {
-	ConversationID           string                      `json:"conversationID" validate:"required"`
-	Direction                *flight_matrix.DirectionInd `json:"direction" validate:"required"`
-	DepartureAirPort         string                      `json:"departureAirPort" validate:"required,min=3,max=3"`
-	ArrivalAirPort           string                      `json:"arrivalAirPort" validate:"required,min=3,max=3"`
-	DepartureDateTime        string                      `json:"departureDateTime" validate:"required,datetime=2006-01-02T15:04:05"`
-	ArrivalDateTime          string                      `json:"arrivalDateTime" validate:"required,datetime=2006-01-02T15:04:05"`
-	PassengerTypeQuantityADT int                         `json:"passengerTypeQuantityADT" validate:"required,numeric"`
-	PassengerTypeQuantityCNN int                         `json:"passengerTypeQuantityCNN" validate:"numeric"`
-	PassengerTypeQuantityINF int                         `json:"passengerTypeQuantityINF" validate:"numeric"`
+	ConversationID    string                      `json:"conversationID" validate:"required"`
+	SessionID         string                      `json:"sessionID" validate:"required,uuid"`
+	Direction         *flight_matrix.DirectionInd `json:"direction" validate:"required"`
+	DepartureAirPort  string                      `json:"departureAirPort" validate:"required,min=3,max=3"`
+	ArrivalAirPort    string                      `json:"arrivalAirPort" validate:"required,min=3,max=3"`
+	DepartureDateTime string                      `json:"departureDateTime" validate:"required,datetime=2006-01-02T15:04:05"`
+	ArrivalDateTime   string                      `json:"arrivalDateTime" validate:"required,datetime=2006-01-02T15:04:05"`
+	QuantityADT       int                         `json:"adt" validate:"required,numeric"`
+	QuantityCNN       int                         `json:"cnn" validate:"numeric"`
+	QuantityINF       int                         `json:"inf" validate:"numeric"`
 }
 
-type (
-	ScheduleResponse struct {
-		OneWay []FlightData `json:"oneWay"`
-		Return []FlightData `json:"return"`
-	}
+type ScheduleResponse struct {
+	OW []OriginDestinationOption `json:"ow"`
+	RT []OriginDestinationOption `json:"rt"`
+}
 
-	FlightData struct {
-		Segments []FlightSegment `json:"segments"`
-	}
+type OriginDestinationOption struct {
+	RPH           uint            `json:"rph"`
+	FlightSegment []FlightSegment `json:"flightSegment"`
+}
 
-	FlightSegment struct {
-		DepartureAirPortCode string    `json:"departureAirPortCode"`
-		ArrivalAirPortCode   string    `json:"arrivalAirPortCode"`
-		DepartureDateTime    string    `json:"departureDateTime"`
-		ArrivalDateTime      string    `json:"arrivalDateTime"`
-		FlightNumber         string    `json:"flightNumber"`
-		OperatingAirlineCode string    `json:"operatingAirlineCode"`
-		MarketingAirlineCode string    `json:"marketingAirlineCode"`
-		AirEquipType         string    `json:"airEquipType"`
-		FlightDuration       string    `json:"flightDuration"`
-		StopsInfo            *StopInfo `json:"stopsInfo"`
-	}
+type FlightSegment struct {
+	ArrivalDateTime     string              `json:"arrivalDateTime"`
+	DepartureDateTime   string              `json:"departureDateTime"`
+	FlightNumber        string              `json:"flightNumber"`
+	StopQuantity        uint                `json:"stopQuantity"`
+	OriginLocation      string              `json:"originLocation"`
+	DestinationLocation string              `json:"destinationLocation"`
+	Equipment           string              `json:"equipment"`
+	MarketingAirline    string              `json:"marketingAirline"`
+	OperatingAirline    string              `json:"operatingAirline"`
+	Duration            string              `json:"duration"`
+	Meal                string              `json:"meal"`
+	BookingClassAvails  []BookingClassAvail `json:"bookingClassAvails"`
+}
 
-	StopInfo struct {
-		AirPortCode       string `json:"airPortCode"`
-		ArrivalDateTime   string `json:"arrivalDateTime"`
-		DepartureDateTime string `json:"departureDateTime"`
-		StopTime          string `json:"stopTime"`
-		ElapsedTime       string `json:"elapsedTime"`
-		AirEquipType      string `json:"airEquipType"`
-	}
-)
+type BookingClassAvail struct {
+	Class    string `json:"class"`
+	Quantity uint   `json:"quantity"`
+}

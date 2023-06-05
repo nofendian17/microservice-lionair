@@ -20,6 +20,7 @@ type SessionCreateXMLRequest struct {
 			Action         string `xml:"Action"`         // CreateSession
 			MessageData    struct {
 				Text      string `xml:",chardata"`
+				MessageId string `xml:"MessageId"`
 				Timestamp string `xml:"Timestamp"`
 			} `xml:"MessageData"`
 		} `xml:"MessageHeader"`

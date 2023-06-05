@@ -10,6 +10,8 @@ import (
 )
 
 type UseCase interface {
+	SessionCreate(ctx context.Context, request model.SessionCreateRequest) (*response.Response, error)
+	SessionClose(ctx context.Context, request model.SessionCloseRequest) (*response.Response, error)
 	ScheduleWithoutSession(ctx context.Context, request model.ScheduleRequest) (*response.Response, error)
 	ScheduleWithSession(ctx context.Context, request model.ScheduleRequest) (*response.Response, error)
 	Pricing(ctx context.Context, request model.PricingRequest) (*response.Response, error)

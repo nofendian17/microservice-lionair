@@ -8,11 +8,10 @@ import (
 )
 
 func (l *lionUseCase) ScheduleWithSession(ctx context.Context, request model.ScheduleRequest) (*response.Response, error) {
-	binarySecurityToken, err := l.sessionCreate.GetBinarySecurityToken(ctx, request.ConversationID, l.config.Integration.Credentials.Username, l.config.Integration.Credentials.Password, l.config.Integration.Credentials.Organization)
+	binarySecurityToken, err := l.redisClient.Get(ctx, request.SessionID)
 	if err != nil {
 		return nil, err
 	}
-
 	schedule, err := l.flightMatrix.GetFlightScheduleWithSession(
 		ctx,
 		request.ConversationID,
@@ -24,19 +23,13 @@ func (l *lionUseCase) ScheduleWithSession(ctx context.Context, request model.Sch
 		request.ArrivalDateTime,
 		request.DepartureAirPort,
 		request.ArrivalAirPort,
-		request.PassengerTypeQuantityADT,
-		request.PassengerTypeQuantityCNN,
-		request.PassengerTypeQuantityINF,
+		request.QuantityADT,
+		request.QuantityCNN,
+		request.QuantityINF,
 	)
 	if err != nil {
 		return nil, err
 	}
-
-	err = l.sessionClose.Logout(ctx, request.ConversationID, binarySecurityToken)
-	if err != nil {
-		return nil, err
-	}
-
 	return &response.Response{
 		Code:    http.StatusOK,
 		Message: http.StatusText(http.StatusOK),
@@ -55,9 +48,9 @@ func (l *lionUseCase) ScheduleWithoutSession(ctx context.Context, request model.
 		request.ArrivalDateTime,
 		request.DepartureAirPort,
 		request.ArrivalAirPort,
-		request.PassengerTypeQuantityADT,
-		request.PassengerTypeQuantityCNN,
-		request.PassengerTypeQuantityINF,
+		request.QuantityADT,
+		request.QuantityCNN,
+		request.QuantityINF,
 	)
 	if err != nil {
 		return nil, err
